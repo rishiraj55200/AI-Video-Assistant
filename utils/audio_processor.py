@@ -6,6 +6,14 @@ import imageio_ffmpeg as ffmpeg
 
 # Use the bundled ffmpeg binary for deployment
 ffmpeg_path = ffmpeg.get_ffmpeg_exe()
+if not ffmpeg_path or not os.path.isfile(ffmpeg_path):
+    raise FileNotFoundError(f"Bundled ffmpeg not found: {ffmpeg_path}")
+
+ffmpeg_dir = os.path.dirname(ffmpeg_path)
+os.environ.setdefault("PATH", os.pathsep.join([ffmpeg_dir, os.environ.get("PATH", "")]))
+os.environ["IMAGEIO_FFMPEG_EXE"] = ffmpeg_path
+os.environ["FFMPEG_BINARY"] = ffmpeg_path
+
 AudioSegment.converter = ffmpeg_path
 AudioSegment.ffmpeg = ffmpeg_path
 AudioSegment.ffprobe = ffmpeg_path
@@ -18,6 +26,7 @@ def download_youtube_audio(url :str) ->str:
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": output_path,
+        "ffmpeg_location": os.path.dirname(ffmpeg_path),
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
