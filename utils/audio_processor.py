@@ -1,6 +1,13 @@
 import yt_dlp
 from pydub import AudioSegment
 import os
+import imageio_ffmpeg as ffmpeg
+
+# Ensure pydub uses the bundled ffmpeg binary when available
+ffmpeg_path = ffmpeg.get_ffmpeg_exe()
+AudioSegment.converter = ffmpeg_path
+AudioSegment.ffmpeg = ffmpeg_path
+AudioSegment.ffprobe = ffmpeg_path
 
 DOWNLOAD_DIR = 'downloades'
 os.makedirs(DOWNLOAD_DIR,exist_ok = True)
