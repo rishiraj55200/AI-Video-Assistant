@@ -26,7 +26,7 @@ def download_youtube_audio(url :str) ->str:
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": output_path,
-        "ffmpeg_location": os.path.dirname(ffmpeg_path),
+        "ffmpeg_location": ffmpeg_path,
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
