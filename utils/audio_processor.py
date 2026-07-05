@@ -1,6 +1,5 @@
 import subprocess
 import yt_dlp
-from pydub import AudioSegment
 import os
 import imageio_ffmpeg as ffmpeg
 
@@ -14,6 +13,7 @@ os.environ.setdefault("PATH", os.pathsep.join([ffmpeg_dir, os.environ.get("PATH"
 os.environ["IMAGEIO_FFMPEG_EXE"] = ffmpeg_path
 os.environ["FFMPEG_BINARY"] = ffmpeg_path
 
+from pydub import AudioSegment
 AudioSegment.converter = ffmpeg_path
 AudioSegment.ffmpeg = ffmpeg_path
 AudioSegment.ffprobe = ffmpeg_path
