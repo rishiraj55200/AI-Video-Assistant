@@ -1,16 +1,17 @@
+import subprocess
 import yt_dlp
 from pydub import AudioSegment
 import os
 import imageio_ffmpeg as ffmpeg
 
-# Ensure pydub uses the bundled ffmpeg binary when available
+# Use the bundled ffmpeg binary for deployment
 ffmpeg_path = ffmpeg.get_ffmpeg_exe()
 AudioSegment.converter = ffmpeg_path
 AudioSegment.ffmpeg = ffmpeg_path
 AudioSegment.ffprobe = ffmpeg_path
 
 DOWNLOAD_DIR = 'downloades'
-os.makedirs(DOWNLOAD_DIR,exist_ok = True)
+os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 def download_youtube_audio(url :str) ->str:
     output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
@@ -44,11 +45,20 @@ def download_youtube_audio(url :str) ->str:
 
 
 def convert_to_wav(input_path: str) -> str:
-    """Convert any audio/video file to WAV format using pydub."""
+    """Convert any audio/video file to WAV format using ffmpeg."""
     output_path = os.path.splitext(input_path)[0] + "_converted.wav"
-    audio = AudioSegment.from_file(input_path)
-    audio = audio.set_channels(1).set_frame_rate(16000) #16khz
-    audio.export(output_path, format="wav")
+    command = [
+        ffmpeg_path,
+        "-y",
+        "-i",
+        input_path,
+        "-ac",
+        "1",
+        "-ar",
+        "16000",
+        output_path,
+    ]
+    subprocess.run(command, check=True)
     return output_path
 
 
