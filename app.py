@@ -1,4 +1,6 @@
 import importlib
+import os
+import tempfile
 import time
 import streamlit as st
 from dotenv import load_dotenv
@@ -371,6 +373,7 @@ with st.sidebar:
 
     st.markdown('<span class="badge badge-purple">Input</span>', unsafe_allow_html=True)
     source = st.text_input("YouTube URL or File Path", placeholder="https://youtube.com/watch?v=... or /path/to/file.mp4")
+    uploaded_file = st.file_uploader("Or upload a local audio/video file", type=["mp3", "wav", "mp4", "m4a", "webm"], help="Use this when YouTube download is blocked.")
 
     language = st.selectbox("Language", ["english", "hinglish"], index=0)
 
@@ -396,9 +399,14 @@ st.markdown("---")
 
 # ── Run Pipeline ────────────────────────────────────────────────────────────────
 if run_btn:
-    if not source.strip():
-        st.error("Please enter a YouTube URL or file path.")
+    if not source.strip() and uploaded_file is None:
+        st.error("Please enter a YouTube URL, file path, or upload a recording.")
     else:
+        if uploaded_file is not None:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{uploaded_file.name}") as temp_file:
+                temp_file.write(uploaded_file.getvalue())
+                source = temp_file.name
+
         st.session_state.pipeline_done = False
         st.session_state.result = None
         st.session_state.chat_history = []
@@ -459,6 +467,13 @@ if run_btn:
                 if st.session_state.pipeline_steps.get(k) == "active":
                     st.session_state.pipeline_steps[k] = "pending"
             progress_placeholder.error(f"❌ Error: {e}")
+
+        finally:
+            if uploaded_file is not None and os.path.exists(source):
+                try:
+                    os.remove(source)
+                except OSError:
+                    pass
 
 # ── Results ──────────────────────────────────────────────────────────────────────
 if st.session_state.result:
