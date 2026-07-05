@@ -18,6 +18,16 @@ def download_youtube_audio(url :str) ->str:
             }
         ],
         "quiet": True,
+        "no_warnings": True,
+        "ignoreerrors": False,
+        "nocheckcertificate": True,
+        "geo_bypass": True,
+        "socket_timeout": 30,
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+        "http_headers": {
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.youtube.com/",
+        },
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
